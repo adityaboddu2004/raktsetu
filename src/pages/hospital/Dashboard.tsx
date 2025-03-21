@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
@@ -249,6 +248,15 @@ const HospitalDashboard = () => {
                 </tbody>
               </table>
             </div>
+          </div>
+          
+          {/* Link to Events & Campaigns page */}
+          <div className="text-center mt-8">
+            <Link to="/events">
+              <Button variant="secondary">
+                View Upcoming Blood Donation Events
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
