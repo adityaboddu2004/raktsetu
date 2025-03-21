@@ -1,9 +1,17 @@
 
+import { User, Bell, Settings } from "lucide-react";
+
 type Role = 'hospital' | 'donor' | null;
 
 type NavigationItem = {
   name: string;
   path: string;
+};
+
+type UserNavigationItem = {
+  name: string;
+  path: string;
+  icon: any;
 };
 
 export const getMainNavigation = (role: Role): NavigationItem[] => {
@@ -58,3 +66,14 @@ export const getDashboardNavigation = (role: Role): NavigationItem[] => {
 
   return [];
 };
+
+export const getUserNavigation = (role: Role): UserNavigationItem[] => 
+  role === "hospital" 
+    ? [
+        { name: "Dashboard", path: "/hospital/dashboard", icon: User },
+        { name: "Emergency Request", path: "/hospital/emergency-request", icon: Bell },
+      ]
+    : [
+        { name: "Dashboard", path: "/donor/dashboard", icon: User },
+        { name: "Alert Settings", path: "/donor/alert-settings", icon: Settings },
+      ];
