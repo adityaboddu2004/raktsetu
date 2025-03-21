@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogIn, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Button from "./Button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -79,12 +79,35 @@ const Navbar = () => {
               </Link>
             ))}
             
-            {isAuthenticated && (
+            {isAuthenticated ? (
               <UserMenu 
                 isOpen={isUserMenuOpen}
                 onToggle={toggleUserMenu}
                 onLogout={handleLogout}
               />
+            ) : (
+              <div className="flex items-center space-x-3">
+                <Link to="/login">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="flex items-center"
+                  >
+                    <LogIn size={16} className="mr-1" />
+                    Login
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button
+                    variant="primary" 
+                    size="sm"
+                    className="flex items-center"
+                  >
+                    <UserPlus size={16} className="mr-1" />
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
             )}
             
             {role === "hospital" && (
@@ -100,6 +123,20 @@ const Navbar = () => {
           
           {/* Mobile navigation toggle */}
           <div className="flex md:hidden">
+            {!isAuthenticated && (
+              <div className="flex items-center space-x-2 mr-2">
+                <Link to="/login">
+                  <Button variant="ghost" size="sm" className="p-1">
+                    <LogIn size={20} />
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button variant="ghost" size="sm" className="p-1">
+                    <UserPlus size={20} />
+                  </Button>
+                </Link>
+              </div>
+            )}
             <button
               type="button"
               className="p-2 -m-2 text-gray-500 rounded-md"
