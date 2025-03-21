@@ -85,7 +85,7 @@ const BloodInventory = () => {
     return (
       <div className="flex items-center justify-center p-12">
         <Loader size={30} className="animate-spin text-blood" />
-        <span className="ml-2 text-muted-foreground">Loading inventory...</span>
+        <span className="ml-2 text-muted">Loading inventory...</span>
       </div>
     );
   }
@@ -94,31 +94,31 @@ const BloodInventory = () => {
     <div className="p-6">
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">Blood Inventory Management</h2>
-        <p className="text-muted-foreground text-sm">Track and manage your hospital's blood supply</p>
+        <p className="text-muted text-sm">Track and manage your hospital's blood supply</p>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-800">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Blood Group
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Units Available
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Last Updated
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className="bg-white divide-y divide-gray-200">
             {inventory.map((item) => (
               <tr key={item.bloodGroup}>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -138,7 +138,7 @@ const BloodInventory = () => {
                     {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {item.lastUpdated}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -148,7 +148,7 @@ const BloodInventory = () => {
                       size="sm" 
                       onClick={() => handleUpdateInventory(item.bloodGroup, 1)}
                       disabled={updating}
-                      className="border border-gray-300 dark:border-gray-600"
+                      className="border border-gray-300"
                     >
                       +1
                     </Button>
@@ -157,7 +157,7 @@ const BloodInventory = () => {
                       size="sm" 
                       onClick={() => handleUpdateInventory(item.bloodGroup, -1)}
                       disabled={updating || item.units === 0}
-                      className="border border-gray-300 dark:border-gray-600"
+                      className="border border-gray-300"
                     >
                       -1
                     </Button>
@@ -169,9 +169,9 @@ const BloodInventory = () => {
         </table>
       </div>
       
-      <div className="mt-6 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+      <div className="mt-6 bg-gray-50 p-4 rounded-lg">
         <h3 className="font-medium mb-2">Need to request emergency blood?</h3>
-        <p className="text-sm text-muted-foreground mb-4">If your inventory is low, you can send emergency requests to nearby donors</p>
+        <p className="text-sm text-muted mb-4">If your inventory is low, you can send emergency requests to nearby donors</p>
         <Button variant="primary">
           Create Emergency Request
         </Button>

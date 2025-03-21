@@ -95,12 +95,12 @@ const HospitalDashboard = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-background pt-16">
+      <div className="min-h-screen bg-white pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold">Hospital Dashboard</h1>
-              <p className="text-muted-foreground mt-1">Manage your blood requests and find donors</p>
+              <p className="text-muted mt-1">Manage your blood requests and find donors</p>
             </div>
             <div className="mt-4 md:mt-0 flex space-x-4">
               <Button
@@ -125,10 +125,10 @@ const HospitalDashboard = () => {
             <div className="glass-card p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-muted-foreground text-sm">Total Requests</p>
+                  <p className="text-muted text-sm">Total Requests</p>
                   <h3 className="text-2xl font-bold mt-1">{hospitalStats.totalRequests}</h3>
                 </div>
-                <div className="bg-blood/10 p-3 rounded-full">
+                <div className="bg-blood-light p-3 rounded-full">
                   <Droplet size={24} className="text-blood" />
                 </div>
               </div>
@@ -137,7 +137,7 @@ const HospitalDashboard = () => {
             <div className="glass-card p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-muted-foreground text-sm">Active Requests</p>
+                  <p className="text-muted text-sm">Active Requests</p>
                   <h3 className="text-2xl font-bold mt-1">{hospitalStats.activeRequests}</h3>
                 </div>
                 <div className="bg-blue-100 p-3 rounded-full">
@@ -149,7 +149,7 @@ const HospitalDashboard = () => {
             <div className="glass-card p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-muted-foreground text-sm">Donors Found</p>
+                  <p className="text-muted text-sm">Donors Found</p>
                   <h3 className="text-2xl font-bold mt-1">{hospitalStats.donorsFound}</h3>
                 </div>
                 <div className="bg-green-100 p-3 rounded-full">
@@ -161,7 +161,7 @@ const HospitalDashboard = () => {
             <div className="glass-card p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-muted-foreground text-sm">Urgent Needs</p>
+                  <p className="text-muted text-sm">Urgent Needs</p>
                   <h3 className="text-2xl font-bold mt-1">{hospitalStats.urgentNeeds}</h3>
                 </div>
                 <div className="bg-yellow-100 p-3 rounded-full">
