@@ -16,6 +16,7 @@ import HospitalDashboard from "./pages/hospital/Dashboard";
 import DonorDashboard from "./pages/donor/Dashboard";
 import AlertSettings from "./pages/donor/AlertSettings";
 import EmergencyRequest from "./pages/hospital/EmergencyRequest";
+import EventsAndCampaigns from "./pages/EventsAndCampaigns";
 import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/become-donor" element={<BecomeDonor />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/events" element={<EventsAndCampaigns />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/hospital/dashboard" element={<HospitalDashboard />} />

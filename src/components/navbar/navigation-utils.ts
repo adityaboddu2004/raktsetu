@@ -1,22 +1,60 @@
 
-import { User, Bell, Settings, LogOut } from "lucide-react";
-import { UserRole } from "@/contexts/AuthContext";
+type Role = 'hospital' | 'donor' | null;
 
-export const getMainNavigation = (role: UserRole) => [
-  { name: "Home", path: "/" },
-  ...(role === "hospital" ? [{ name: "Find Donor", path: "/find-donor" }] : []),
-  ...(role !== "hospital" ? [{ name: "Become Donor", path: "/become-donor" }] : []),
-  { name: "About", path: "/about" },
-  { name: "Contact", path: "/contact" },
-];
+type NavigationItem = {
+  name: string;
+  path: string;
+};
 
-export const getUserNavigation = (role: UserRole) => 
-  role === "hospital" 
-    ? [
-        { name: "Dashboard", path: "/hospital/dashboard", icon: User },
-        { name: "Emergency Request", path: "/hospital/emergency-request", icon: Bell },
-      ]
-    : [
-        { name: "Dashboard", path: "/donor/dashboard", icon: User },
-        { name: "Alert Settings", path: "/donor/alert-settings", icon: Settings },
-      ];
+export const getMainNavigation = (role: Role): NavigationItem[] => {
+  const navigation: NavigationItem[] = [
+    { name: 'Home', path: '/' },
+    { name: 'Find a Donor', path: '/find-donor' },
+    { name: 'Events & Campaigns', path: '/events' },
+    { name: 'About', path: '/about' },
+    { name: 'Contact', path: '/contact' },
+  ];
+
+  // Add role-specific routes
+  if (role) {
+    if (role === 'hospital') {
+      navigation.push({ name: 'Dashboard', path: '/hospital/dashboard' });
+    } else if (role === 'donor') {
+      navigation.push({ name: 'Dashboard', path: '/donor/dashboard' });
+    }
+  }
+
+  return navigation;
+};
+
+export const getAuthNavigation = (isAuthenticated: boolean, role: Role): NavigationItem[] => {
+  if (!isAuthenticated) {
+    return [
+      { name: 'Login', path: '/login' },
+      { name: 'Register', path: '/register' },
+    ];
+  }
+
+  return [];
+};
+
+export const getDashboardNavigation = (role: Role): NavigationItem[] => {
+  if (role === 'hospital') {
+    return [
+      { name: 'Overview', path: '/hospital/dashboard' },
+      { name: 'Blood Inventory', path: '/hospital/inventory' },
+      { name: 'Donor Management', path: '/hospital/donors' },
+      { name: 'Emergency Request', path: '/hospital/emergency-request' },
+      { name: 'Reports', path: '/hospital/reports' },
+    ];
+  } else if (role === 'donor') {
+    return [
+      { name: 'Overview', path: '/donor/dashboard' },
+      { name: 'Donation History', path: '/donor/history' },
+      { name: 'Alert Settings', path: '/donor/alert-settings' },
+      { name: 'Health Records', path: '/donor/health' },
+    ];
+  }
+
+  return [];
+};
