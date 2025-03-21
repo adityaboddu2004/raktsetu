@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Plus, Search, ChevronRight, Droplet, Users, AlertTriangle } from 'lucide-react';
 import Button from '@/components/Button';
