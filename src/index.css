@@ -31,7 +31,7 @@
   }
 
   .text-gradient {
-    @apply bg-gradient-to-br from-blood to-blood/70 bg-clip-text text-transparent;
+    @apply bg-gradient-to-br from-blood to-blood-70 bg-clip-text text-transparent;
   }
 }
 
