@@ -6,7 +6,6 @@ import HowItWorks from "@/components/HowItWorks";
 import Testimonials from "@/components/Testimonials";
 import CTASection from "@/components/CTASection";
 import BloodCompatibilityChart from "@/components/BloodCompatibilityChart";
-import CampaignsAndEvents from "@/components/CampaignsAndEvents";
 import { Link } from "react-router-dom";
 import { LogIn, UserPlus } from "lucide-react";
 import Button from "@/components/Button";
@@ -35,12 +34,19 @@ const Index = () => {
       <Statistics />
       <HowItWorks />
       
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        <BloodCompatibilityChart />
-      </div>
-      
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <CampaignsAndEvents />
+      {/* Blood Compatibility Section */}
+      <div className="bg-red-50 py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-4">
+              <span className="text-blood">Blood Compatibility</span> Chart
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Find out which blood types are compatible with yours. Select your blood type and see who you can donate to and receive from.
+            </p>
+          </div>
+          <BloodCompatibilityChart />
+        </div>
       </div>
       
       <Testimonials />

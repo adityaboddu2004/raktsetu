@@ -1,13 +1,34 @@
 
-import { User, Bell, Settings, LogOut } from "lucide-react";
+import { User, Bell, Settings } from "lucide-react";
 
 export const getMainNavigation = (role) => [
   { name: "Home", path: "/" },
-  ...(role === "hospital" ? [{ name: "Find Donor", path: "/find-donor" }] : []),
-  ...(role !== "hospital" ? [{ name: "Become Donor", path: "/become-donor" }] : []),
+  { name: "Find a Donor", path: "/find-donor" },
+  { name: "Events & Campaigns", path: "/events" },
   { name: "About", path: "/about" },
   { name: "Contact", path: "/contact" },
+  ...(role === "hospital" ? [{ name: "Dashboard", path: "/hospital/dashboard" }] : []),
+  ...(role === "donor" ? [{ name: "Dashboard", path: "/donor/dashboard" }] : []),
 ];
+
+export const getDashboardNavigation = (role) => {
+  if (role === 'hospital') {
+    return [
+      { name: 'Overview', path: '/hospital/dashboard' },
+      { name: 'Blood Requests', path: '/hospital/all-requests' },
+      { name: 'Emergency Request', path: '/hospital/emergency-request' },
+    ];
+  } else if (role === 'donor') {
+    return [
+      { name: 'Overview', path: '/donor/dashboard' },
+      { name: 'Donation History', path: '/donor/history' },
+      { name: 'Alert Settings', path: '/donor/alert-settings' },
+      { name: 'Health Records', path: '/donor/health' },
+    ];
+  }
+  
+  return [];
+};
 
 export const getUserNavigation = (role) => 
   role === "hospital" 

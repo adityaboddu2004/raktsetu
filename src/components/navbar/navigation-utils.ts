@@ -50,10 +50,8 @@ export const getDashboardNavigation = (role: Role): NavigationItem[] => {
   if (role === 'hospital') {
     return [
       { name: 'Overview', path: '/hospital/dashboard' },
-      { name: 'Blood Inventory', path: '/hospital/inventory' },
-      { name: 'Donor Management', path: '/hospital/donors' },
+      { name: 'Blood Requests', path: '/hospital/all-requests' },
       { name: 'Emergency Request', path: '/hospital/emergency-request' },
-      { name: 'Reports', path: '/hospital/reports' },
     ];
   } else if (role === 'donor') {
     return [
