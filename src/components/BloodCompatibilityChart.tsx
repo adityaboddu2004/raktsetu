@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Droplet, ArrowRight, ArrowLeft } from "lucide-react";
+import { Droplet, ArrowRight } from "lucide-react";
 
 const BloodCompatibilityChart = () => {
   const [selectedBloodType, setSelectedBloodType] = useState<string | null>(null);
@@ -45,116 +45,6 @@ const BloodCompatibilityChart = () => {
     setSelectedBloodType(null);
   };
   
-  const renderBloodTypeGrid = () => {
-    if (!selectedBloodType) {
-      return (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {bloodTypes.map((bloodType) => (
-            <button
-              key={bloodType}
-              onClick={() => handleBloodTypeClick(bloodType)}
-              className={`border rounded-lg p-4 flex flex-col items-center justify-center transition-all
-                bg-white hover:bg-red-50 border-gray-200 hover:border-blood/30 hover:shadow-md
-              `}
-            >
-              <div className="flex items-center justify-center mb-2">
-                <Droplet 
-                  size={24} 
-                  className="mr-2 text-blood" 
-                  fill="#fadcdc"
-                />
-                <span className="text-2xl font-bold">{bloodType}</span>
-              </div>
-              <div className="text-xs mt-1 text-center">
-                <span className="font-medium">Click to select</span>
-              </div>
-            </button>
-          ))}
-        </div>
-      );
-    }
-
-    // Shows compatibility based on selected blood type
-    const compatibleTypes = compatibility[view][selectedBloodType] || [];
-    
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
-          <div className="flex items-center gap-2">
-            <Droplet size={28} className="text-blood" fill="#fadcdc" />
-            <span className="text-2xl font-bold">{selectedBloodType}</span>
-            <span className="text-lg ml-2">can {view === 'donate' ? 'donate to' : 'receive from'}:</span>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={toggleView}
-              className="px-4 py-2 bg-white rounded-lg border border-gray-200 hover:bg-red-50 hover:border-blood/30 flex items-center gap-2 transition-colors"
-            >
-              {view === 'donate' ? (
-                <>
-                  <span>Switch to receive view</span>
-                  <ArrowLeft size={18} />
-                </>
-              ) : (
-                <>
-                  <span>Switch to donate view</span>
-                  <ArrowRight size={18} />
-                </>
-              )}
-            </button>
-            
-            <button 
-              onClick={resetSelection}
-              className="px-4 py-2 bg-white rounded-lg border border-gray-200 hover:bg-red-50 hover:border-blood/30 transition-colors"
-            >
-              Back to all types
-            </button>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {bloodTypes.map((bloodType) => {
-            const isCompatible = compatibleTypes.includes(bloodType);
-            const isSelected = bloodType === selectedBloodType;
-            
-            return (
-              <div 
-                key={bloodType}
-                className={`border rounded-lg p-4 flex flex-col items-center justify-center transition-all
-                  ${isSelected ? 'ring-2 ring-blood' : ''}
-                  ${isCompatible || isSelected
-                    ? 'bg-green-50 border-green-200 text-green-600' 
-                    : 'bg-gray-50 border-gray-200 text-gray-400'
-                  }
-                `}
-              >
-                <div className="flex items-center justify-center mb-2">
-                  <Droplet 
-                    size={24} 
-                    className={`mr-2 ${isCompatible || isSelected ? 'text-blood' : 'text-gray-300'}`} 
-                    fill={isCompatible || isSelected ? '#fadcdc' : 'none'}
-                  />
-                  <span className="text-2xl font-bold">{bloodType}</span>
-                </div>
-                
-                <div className="text-xs mt-1 text-center">
-                  {isSelected ? (
-                    <span className="font-medium">Your Blood Type</span>
-                  ) : isCompatible ? (
-                    <span className="font-medium">{view === 'donate' ? 'Can Receive' : 'Can Donate'}</span>
-                  ) : (
-                    <span>Not Compatible</span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-  
   return (
     <Card className="shadow-sm">
       <CardContent className="pt-6">
@@ -171,7 +61,112 @@ const BloodCompatibilityChart = () => {
           )}
         </div>
         
-        {renderBloodTypeGrid()}
+        {!selectedBloodType ? (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {bloodTypes.map((bloodType) => (
+              <button
+                key={bloodType}
+                onClick={() => handleBloodTypeClick(bloodType)}
+                className="border rounded-lg p-4 flex flex-col items-center justify-center transition-all
+                  bg-white hover:bg-red-50 border-gray-200 hover:border-blood/30 hover:shadow-md"
+              >
+                <div className="flex items-center justify-center mb-2">
+                  <Droplet 
+                    size={24} 
+                    className="mr-2 text-blood" 
+                    fill="#fadcdc"
+                  />
+                  <span className="text-2xl font-bold">{bloodType}</span>
+                </div>
+                <div className="text-xs mt-1 text-center">
+                  <span className="font-medium">Select</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
+              <div className="flex items-center gap-2">
+                <Droplet size={28} className="text-blood" fill="#fadcdc" />
+                <span className="text-2xl font-bold">{selectedBloodType}</span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <button 
+                  className={`px-3 py-1.5 rounded-lg transition-colors ${
+                    view === 'donate' 
+                      ? 'bg-blood text-white' 
+                      : 'bg-white text-gray-700 border border-gray-200'
+                  }`}
+                  onClick={() => setView('donate')}
+                >
+                  Can Donate To
+                </button>
+                
+                <button 
+                  className={`px-3 py-1.5 rounded-lg transition-colors ${
+                    view === 'receive' 
+                      ? 'bg-blood text-white' 
+                      : 'bg-white text-gray-700 border border-gray-200'
+                  }`}
+                  onClick={() => setView('receive')}
+                >
+                  Can Receive From
+                </button>
+                
+                <button 
+                  onClick={resetSelection}
+                  className="px-3 py-1.5 bg-white rounded-lg border border-gray-200 hover:bg-red-50 hover:border-blood/30 transition-colors"
+                >
+                  Back
+                </button>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {bloodTypes.map((bloodType) => {
+                const compatibleTypes = compatibility[view][selectedBloodType] || [];
+                const isCompatible = compatibleTypes.includes(bloodType);
+                const isSelected = bloodType === selectedBloodType;
+                
+                return (
+                  <div 
+                    key={bloodType}
+                    className={`border rounded-lg p-4 flex flex-col items-center justify-center transition-all
+                      ${isSelected ? 'ring-2 ring-blood' : ''}
+                      ${isCompatible || isSelected
+                        ? 'bg-green-50 border-green-200 text-green-600' 
+                        : 'bg-gray-50 border-gray-200 text-gray-400'
+                      }
+                    `}
+                  >
+                    <div className="flex items-center justify-center mb-2">
+                      <Droplet 
+                        size={24} 
+                        className={`mr-2 ${isCompatible || isSelected ? 'text-blood' : 'text-gray-300'}`} 
+                        fill={isCompatible || isSelected ? '#fadcdc' : 'none'}
+                      />
+                      <span className="text-2xl font-bold">{bloodType}</span>
+                    </div>
+                    
+                    <div className="text-xs mt-1 text-center">
+                      {isSelected ? (
+                        <span className="font-medium">Your Blood Type</span>
+                      ) : isCompatible ? (
+                        <span className="font-medium">
+                          {view === 'donate' ? 'Can Receive' : 'Can Donate'}
+                        </span>
+                      ) : (
+                        <span>Not Compatible</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
         
         <div className="mt-6 text-sm text-muted-foreground">
           <p className="mb-1">Important notes:</p>
