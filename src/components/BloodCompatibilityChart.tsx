@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Droplet } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const BloodCompatibilityChart = () => {
   const [selectedBloodType, setSelectedBloodType] = useState<string | null>(null);
@@ -54,6 +55,28 @@ const BloodCompatibilityChart = () => {
             <p className="text-sm text-muted-foreground">
               Click on any blood type below to see detailed compatibility information
             </p>
+          )}
+          
+          {selectedBloodType && (
+            <div className="flex justify-center gap-4 mb-4">
+              <Button 
+                variant={view === 'donate' ? "default" : "outline"}
+                onClick={() => setView('donate')}
+                size="sm"
+                className={`${view === 'donate' ? 'bg-blood hover:bg-blood-hover' : ''}`}
+              >
+                Can donate to
+              </Button>
+              
+              <Button 
+                variant={view === 'receive' ? "default" : "outline"}
+                onClick={() => setView('receive')}
+                size="sm"
+                className={`${view === 'receive' ? 'bg-blood hover:bg-blood-hover' : ''}`}
+              >
+                Can receive from
+              </Button>
+            </div>
           )}
         </div>
         
@@ -109,17 +132,6 @@ const BloodCompatibilityChart = () => {
             );
           })}
         </div>
-        
-        {selectedBloodType && (
-          <div className="mt-4 flex justify-center">
-            <button 
-              className="px-4 py-2 border border-gray-200 rounded-md bg-white hover:bg-gray-50 transition-colors"
-              onClick={toggleView}
-            >
-              Switch to {view === 'donate' ? 'Receive From' : 'Donate To'} view
-            </button>
-          </div>
-        )}
         
         <div className="mt-6 text-sm text-muted-foreground">
           <p className="mb-1">Important notes:</p>
