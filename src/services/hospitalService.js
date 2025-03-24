@@ -1,6 +1,5 @@
 
 import { getHospitalsCollection, getBloodRequestsCollection } from '../db/mongodb';
-import { ObjectId } from 'mongodb';
 
 // Get all hospitals
 export async function getAllHospitals() {
@@ -50,7 +49,7 @@ export async function updateBloodRequestStatus(requestId, status, notes = '') {
   try {
     const collection = await getBloodRequestsCollection();
     const result = await collection.updateOne(
-      { _id: new ObjectId(requestId) },
+      { _id: requestId },
       { 
         $set: { 
           status, 
@@ -70,7 +69,7 @@ export async function updateBloodRequestStatus(requestId, status, notes = '') {
 export async function getBloodInventory(hospitalId) {
   try {
     const collection = await getHospitalsCollection();
-    const hospital = await collection.findOne({ _id: new ObjectId(hospitalId) });
+    const hospital = await collection.findOne({ _id: hospitalId });
     return hospital?.bloodInventory || {};
   } catch (error) {
     console.error('Error fetching blood inventory:', error);
@@ -83,7 +82,7 @@ export async function updateBloodInventory(hospitalId, bloodGroup, quantity) {
   try {
     const collection = await getHospitalsCollection();
     const result = await collection.updateOne(
-      { _id: new ObjectId(hospitalId) },
+      { _id: hospitalId },
       { 
         $set: { 
           [`bloodInventory.${bloodGroup}`]: quantity,

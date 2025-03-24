@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { donorAPI, hospitalAPI } from '../utils/apiUtils';
+import { toast } from '@/hooks/use-toast';
 
 const ExampleDataFetching = () => {
   const [donors, setDonors] = useState([]);
@@ -21,10 +22,22 @@ const ExampleDataFetching = () => {
         
         setDonors(donorsData);
         setHospitals(hospitalsData);
+        
+        toast({
+          title: 'Data loaded successfully',
+          description: 'Using simulated data for development',
+        });
+        
         setError(null);
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('Failed to load data. Please try again later.');
+        
+        toast({
+          title: 'Error loading data',
+          description: 'Could not connect to the database',
+          variant: 'destructive',
+        });
       } finally {
         setLoading(false);
       }
@@ -33,8 +46,18 @@ const ExampleDataFetching = () => {
     fetchData();
   }, []);
 
-  if (loading) return <div>Loading data...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
+  if (loading) return <div className="p-4 text-center">Loading data...</div>;
+  if (error) return <div className="p-4 text-center text-red-500">{error}</div>;
+
+  // Add sample data for development if empty
+  if (donors.length === 0 && hospitals.length === 0) {
+    return (
+      <div className="p-4 text-center">
+        <p className="mb-4">No data found. This is using a simulated database for development.</p>
+        <p className="text-muted-foreground">In production, this would connect to your MongoDB database.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
