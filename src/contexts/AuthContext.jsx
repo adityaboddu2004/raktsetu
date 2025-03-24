@@ -1,5 +1,6 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
+import { getUsersCollection } from '@/db/mongodb';
 
 const AuthContext = createContext(undefined);
 
@@ -19,21 +20,22 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password, role) => {
     setIsLoading(true);
     try {
-      // Check if a user with this email exists in localStorage (for demo purposes)
-      const allUsers = Object.keys(localStorage)
-        .filter(key => key.startsWith('registered_'))
-        .map(key => JSON.parse(localStorage.getItem(key) || '{}'));
+      // Get the users collection from MongoDB
+      const usersCollection = await getUsersCollection();
       
-      const existingUser = allUsers.find(u => u.email === email);
+      // Find the user with the given email
+      const existingUser = await usersCollection.findOne({ email });
       
       if (existingUser) {
-        // If user exists, log them in with their saved role and profile data
-        const mockUser = {
-          id: existingUser.id,
+        // In a real app, you would check password hash here
+        // For simplicity, we're just checking if the user exists
+        
+        const userObject = {
+          id: existingUser._id.toString(),
           email: existingUser.email,
           name: existingUser.name,
           role: existingUser.role,
-          profile: existingUser.profile || {}, // Keep any existing profile data
+          profile: existingUser.profile || {},
           bloodGroup: existingUser.bloodGroup,
           location: existingUser.location,
           gender: existingUser.gender,
@@ -41,21 +43,11 @@ export const AuthProvider = ({ children }) => {
           isVerified: existingUser.isVerified || false
         };
         
-        setUser(mockUser);
-        localStorage.setItem('user', JSON.stringify(mockUser));
+        setUser(userObject);
+        localStorage.setItem('user', JSON.stringify(userObject));
+        return userObject;
       } else {
-        // If no user exists, create a mock user with the provided role
-        const mockUser = {
-          id: Math.random().toString(36).substr(2, 9),
-          email,
-          name: email.split('@')[0],
-          role,
-          profile: {},
-          isVerified: false
-        };
-        
-        setUser(mockUser);
-        localStorage.setItem('user', JSON.stringify(mockUser));
+        throw new Error('User not found');
       }
     } catch (error) {
       console.error('Login failed:', error);
@@ -68,25 +60,43 @@ export const AuthProvider = ({ children }) => {
   const register = async (email, password, name, role) => {
     setIsLoading(true);
     try {
-      // Generate a unique ID for the user
-      const userId = Math.random().toString(36).substr(2, 9);
+      // Get the users collection from MongoDB
+      const usersCollection = await getUsersCollection();
       
-      // Create the user object
-      const mockUser = {
-        id: userId,
+      // Check if user already exists
+      const existingUser = await usersCollection.findOne({ email });
+      
+      if (existingUser) {
+        throw new Error('User with this email already exists');
+      }
+      
+      // Create a new user document
+      const newUser = {
         email,
         name,
         role,
         profile: {},
-        isVerified: false
+        isVerified: false,
+        createdAt: new Date()
       };
       
-      // Store the registered user in localStorage with a unique key
-      localStorage.setItem(`registered_${email}`, JSON.stringify(mockUser));
+      // Insert the new user into the collection
+      const result = await usersCollection.insertOne(newUser);
       
-      // Set the current user and log them in
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
+      if (!result.insertedId) {
+        throw new Error('Failed to create user');
+      }
+      
+      // Set the current user object
+      const userObject = {
+        id: result.insertedId.toString(),
+        ...newUser
+      };
+      
+      setUser(userObject);
+      localStorage.setItem('user', JSON.stringify(userObject));
+      
+      return userObject;
     } catch (error) {
       console.error('Registration failed:', error);
       throw error;
@@ -95,27 +105,37 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const updateUserProfile = (profileData) => {
+  const updateUserProfile = async (profileData) => {
     if (!user) return;
 
-    const updatedUser = {
-      ...user,
-      ...profileData,
-      profile: {
-        ...(user.profile || {}),
-        ...(profileData.profile || {})
-      }
-    };
-
-    setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-
-    // Also update in the registered_ entry
-    if (user.email) {
-      localStorage.setItem(`registered_${user.email}`, JSON.stringify(updatedUser));
+    try {
+      // Get the users collection from MongoDB
+      const usersCollection = await getUsersCollection();
+      
+      // Update the user in the database
+      const updatedUser = {
+        ...user,
+        ...profileData,
+        profile: {
+          ...(user.profile || {}),
+          ...(profileData.profile || {})
+        }
+      };
+      
+      await usersCollection.updateOne(
+        { email: user.email },
+        { $set: updatedUser }
+      );
+      
+      // Update local state
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      return updatedUser;
+    } catch (error) {
+      console.error('Profile update failed:', error);
+      throw error;
     }
-
-    return updatedUser;
   };
 
   const logout = () => {

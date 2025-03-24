@@ -50,7 +50,7 @@ const Register = () => {
       console.error(error);
       toast({
         title: 'Registration failed',
-        description: 'There was an error creating your account. Please try again.',
+        description: error.message || 'There was an error creating your account. Please try again.',
         variant: 'destructive',
       });
     } finally {

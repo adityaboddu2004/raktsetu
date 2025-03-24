@@ -2,8 +2,8 @@
 // MongoDB connection setup
 import { MongoClient } from 'mongodb';
 
-// Connection URL - replace with your MongoDB connection string
-const url = 'mongodb://localhost:27017';
+// Connection URL with your MongoDB Atlas connection string
+const url = 'mongodb+srv://admin:Admin%401605@cluster0.gizih.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 // Database Name
 const dbName = 'raktsetu';
 
@@ -35,19 +35,25 @@ export async function closeMongoDBConnection() {
   }
 }
 
-// Example method to get blood donors collection
+// Method to get users collection (for authentication)
+export async function getUsersCollection() {
+  const db = await connectToMongoDB();
+  return db.collection('users');
+}
+
+// Method to get blood donors collection
 export async function getDonorsCollection() {
   const db = await connectToMongoDB();
   return db.collection('donors');
 }
 
-// Example method to get hospitals collection
+// Method to get hospitals collection
 export async function getHospitalsCollection() {
   const db = await connectToMongoDB();
   return db.collection('hospitals');
 }
 
-// Example method to get blood requests collection
+// Method to get blood requests collection
 export async function getBloodRequestsCollection() {
   const db = await connectToMongoDB();
   return db.collection('bloodRequests');

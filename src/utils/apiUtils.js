@@ -1,122 +1,276 @@
 
 // API utility functions to connect with MongoDB backend
-
-// Base URL for the API
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://your-production-api.com/api' 
-  : 'http://localhost:5000/api';
-
-// Generic fetch function with error handling
-async function fetchFromAPI(endpoint, options = {}) {
-  const url = `${API_BASE_URL}${endpoint}`;
-  
-  try {
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `API error: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error(`Error fetching from ${endpoint}:`, error);
-    throw error;
-  }
-}
+import { 
+  getUsersCollection, 
+  getDonorsCollection, 
+  getHospitalsCollection, 
+  getBloodRequestsCollection 
+} from '@/db/mongodb';
 
 // Donor API functions
 export const donorAPI = {
   // Get all donors
-  getAllDonors: () => fetchFromAPI('/donors'),
+  getAllDonors: async () => {
+    try {
+      const donorsCollection = await getDonorsCollection();
+      return await donorsCollection.find({}).toArray();
+    } catch (error) {
+      console.error('Error fetching donors:', error);
+      throw error;
+    }
+  },
   
   // Get donor by ID
-  getDonorById: (id) => fetchFromAPI(`/donors/${id}`),
+  getDonorById: async (id) => {
+    try {
+      const donorsCollection = await getDonorsCollection();
+      return await donorsCollection.findOne({ _id: id });
+    } catch (error) {
+      console.error(`Error fetching donor with ID ${id}:`, error);
+      throw error;
+    }
+  },
   
   // Register a new donor
-  registerDonor: (donorData) => fetchFromAPI('/donors', {
-    method: 'POST',
-    body: JSON.stringify(donorData),
-  }),
+  registerDonor: async (donorData) => {
+    try {
+      const donorsCollection = await getDonorsCollection();
+      const result = await donorsCollection.insertOne(donorData);
+      return { id: result.insertedId, ...donorData };
+    } catch (error) {
+      console.error('Error registering donor:', error);
+      throw error;
+    }
+  },
   
   // Update donor profile
-  updateDonorProfile: (id, profileData) => fetchFromAPI(`/donors/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(profileData),
-  }),
+  updateDonorProfile: async (id, profileData) => {
+    try {
+      const donorsCollection = await getDonorsCollection();
+      await donorsCollection.updateOne(
+        { _id: id },
+        { $set: profileData }
+      );
+      return { id, ...profileData };
+    } catch (error) {
+      console.error(`Error updating donor profile with ID ${id}:`, error);
+      throw error;
+    }
+  },
   
   // Get donors by blood group
-  getDonorsByBloodGroup: (bloodGroup) => fetchFromAPI(`/donors/bloodgroup/${bloodGroup}`),
+  getDonorsByBloodGroup: async (bloodGroup) => {
+    try {
+      const donorsCollection = await getDonorsCollection();
+      return await donorsCollection.find({ bloodGroup }).toArray();
+    } catch (error) {
+      console.error(`Error fetching donors with blood group ${bloodGroup}:`, error);
+      throw error;
+    }
+  },
 };
 
 // Hospital API functions
 export const hospitalAPI = {
   // Get all hospitals
-  getAllHospitals: () => fetchFromAPI('/hospitals'),
+  getAllHospitals: async () => {
+    try {
+      const hospitalsCollection = await getHospitalsCollection();
+      return await hospitalsCollection.find({}).toArray();
+    } catch (error) {
+      console.error('Error fetching hospitals:', error);
+      throw error;
+    }
+  },
   
   // Get hospital by ID
-  getHospitalById: (id) => fetchFromAPI(`/hospitals/${id}`),
+  getHospitalById: async (id) => {
+    try {
+      const hospitalsCollection = await getHospitalsCollection();
+      return await hospitalsCollection.findOne({ _id: id });
+    } catch (error) {
+      console.error(`Error fetching hospital with ID ${id}:`, error);
+      throw error;
+    }
+  },
   
   // Register a new hospital
-  registerHospital: (hospitalData) => fetchFromAPI('/hospitals', {
-    method: 'POST',
-    body: JSON.stringify(hospitalData),
-  }),
+  registerHospital: async (hospitalData) => {
+    try {
+      const hospitalsCollection = await getHospitalsCollection();
+      const result = await hospitalsCollection.insertOne(hospitalData);
+      return { id: result.insertedId, ...hospitalData };
+    } catch (error) {
+      console.error('Error registering hospital:', error);
+      throw error;
+    }
+  },
   
   // Create a blood request
-  createBloodRequest: (requestData) => fetchFromAPI('/blood-requests', {
-    method: 'POST',
-    body: JSON.stringify(requestData),
-  }),
+  createBloodRequest: async (requestData) => {
+    try {
+      const bloodRequestsCollection = await getBloodRequestsCollection();
+      const result = await bloodRequestsCollection.insertOne({
+        ...requestData,
+        createdAt: new Date(),
+        status: 'pending'
+      });
+      return { id: result.insertedId, ...requestData, status: 'pending' };
+    } catch (error) {
+      console.error('Error creating blood request:', error);
+      throw error;
+    }
+  },
   
   // Update blood request status
-  updateBloodRequestStatus: (id, status, notes) => fetchFromAPI(`/blood-requests/${id}/status`, {
-    method: 'PUT',
-    body: JSON.stringify({ status, notes }),
-  }),
+  updateBloodRequestStatus: async (id, status, notes) => {
+    try {
+      const bloodRequestsCollection = await getBloodRequestsCollection();
+      await bloodRequestsCollection.updateOne(
+        { _id: id },
+        { 
+          $set: { 
+            status, 
+            notes,
+            updatedAt: new Date() 
+          } 
+        }
+      );
+      return { id, status, notes };
+    } catch (error) {
+      console.error(`Error updating blood request status for ID ${id}:`, error);
+      throw error;
+    }
+  },
   
   // Get blood inventory
-  getBloodInventory: (hospitalId) => fetchFromAPI(`/hospitals/${hospitalId}/blood-inventory`),
+  getBloodInventory: async (hospitalId) => {
+    try {
+      const hospitalsCollection = await getHospitalsCollection();
+      const hospital = await hospitalsCollection.findOne({ _id: hospitalId });
+      return hospital?.bloodInventory || {};
+    } catch (error) {
+      console.error(`Error fetching blood inventory for hospital ID ${hospitalId}:`, error);
+      throw error;
+    }
+  },
   
   // Update blood inventory
-  updateBloodInventory: (hospitalId, inventoryData) => fetchFromAPI(`/hospitals/${hospitalId}/blood-inventory`, {
-    method: 'PUT',
-    body: JSON.stringify(inventoryData),
-  }),
+  updateBloodInventory: async (hospitalId, inventoryData) => {
+    try {
+      const hospitalsCollection = await getHospitalsCollection();
+      await hospitalsCollection.updateOne(
+        { _id: hospitalId },
+        { $set: { bloodInventory: inventoryData } }
+      );
+      return inventoryData;
+    } catch (error) {
+      console.error(`Error updating blood inventory for hospital ID ${hospitalId}:`, error);
+      throw error;
+    }
+  },
 };
 
 // Authentication API functions
 export const authAPI = {
   // Login
-  login: (credentials) => fetchFromAPI('/auth/login', {
-    method: 'POST',
-    body: JSON.stringify(credentials),
-  }),
+  login: async (credentials) => {
+    try {
+      const usersCollection = await getUsersCollection();
+      const user = await usersCollection.findOne({ email: credentials.email });
+      
+      if (!user) {
+        throw new Error('User not found');
+      }
+      
+      // In a production app, you would compare hashed passwords here
+      
+      return {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        name: user.name,
+        isVerified: user.isVerified || false
+      };
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
+  },
   
   // Register
-  register: (userData) => fetchFromAPI('/auth/register', {
-    method: 'POST',
-    body: JSON.stringify(userData),
-  }),
+  register: async (userData) => {
+    try {
+      const usersCollection = await getUsersCollection();
+      
+      // Check if email is already registered
+      const existingUser = await usersCollection.findOne({ email: userData.email });
+      if (existingUser) {
+        throw new Error('Email already registered');
+      }
+      
+      // In a production app, you would hash the password here
+      
+      const newUser = {
+        email: userData.email,
+        name: userData.name,
+        role: userData.role,
+        isVerified: false,
+        createdAt: new Date()
+      };
+      
+      const result = await usersCollection.insertOne(newUser);
+      
+      return {
+        id: result.insertedId,
+        ...newUser
+      };
+    } catch (error) {
+      console.error('Registration failed:', error);
+      throw error;
+    }
+  },
   
   // Verify user
-  verifyUser: (token) => fetchFromAPI(`/auth/verify/${token}`),
+  verifyUser: async (token) => {
+    try {
+      // This would be implemented with a proper token verification system
+      // For now, we'll just return a mock response
+      return { success: true };
+    } catch (error) {
+      console.error('User verification failed:', error);
+      throw error;
+    }
+  },
   
   // Forgot password
-  forgotPassword: (email) => fetchFromAPI('/auth/forgot-password', {
-    method: 'POST',
-    body: JSON.stringify({ email }),
-  }),
+  forgotPassword: async (email) => {
+    try {
+      const usersCollection = await getUsersCollection();
+      const user = await usersCollection.findOne({ email });
+      
+      if (!user) {
+        throw new Error('User not found');
+      }
+      
+      // In a production app, you would generate a password reset token and send an email
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Forgot password request failed:', error);
+      throw error;
+    }
+  },
   
   // Reset password
-  resetPassword: (token, newPassword) => fetchFromAPI('/auth/reset-password', {
-    method: 'POST',
-    body: JSON.stringify({ token, newPassword }),
-  }),
+  resetPassword: async (token, newPassword) => {
+    try {
+      // This would be implemented with a proper token verification system
+      // For now, we'll just return a mock response
+      return { success: true };
+    } catch (error) {
+      console.error('Password reset failed:', error);
+      throw error;
+    }
+  },
 };
