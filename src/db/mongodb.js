@@ -1,14 +1,6 @@
 
 // MongoDB connection utilities for browser environment
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-
-// JWT Secret (should be in an environment variable in production)
-export const JWT_SECRET = 'raktsetu-jwt-secret-key-2024';
-export const JWT_EXPIRES_IN = '7d';
-
-// Since MongoDB can't be directly used in the browser,
-// we'll create a simulated interface that will later connect to a backend API
+// Using browser-compatible implementations instead of Node-specific modules
 
 // In-memory data store (for development/demo purposes only)
 const inMemoryDB = {
@@ -23,6 +15,10 @@ function generateId() {
   return Math.random().toString(36).substring(2, 15) + 
          Math.random().toString(36).substring(2, 15);
 }
+
+// Simple JWT simulation for browser environment
+const JWT_SECRET = 'raktsetu-jwt-secret-key-2024';
+const JWT_EXPIRES_IN = '7d';
 
 // Collections access methods
 export async function getUsersCollection() {
@@ -165,33 +161,69 @@ export async function getBloodRequestsCollection() {
   };
 }
 
-// Password utilities
+// Browser-compatible password hashing (simplified for demo)
 export async function hashPassword(password) {
-  return await bcrypt.hash(password, 10);
+  // In a real app, use a proper hashing library that works in browsers
+  // This is a very simplified hash for demonstration only
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password + JWT_SECRET);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 export async function comparePasswords(plainPassword, hashedPassword) {
-  return await bcrypt.compare(plainPassword, hashedPassword);
+  const hashedPlainPassword = await hashPassword(plainPassword);
+  return hashedPlainPassword === hashedPassword;
 }
 
-// JWT utilities
+// Browser-compatible JWT implementation (simplified)
 export function generateToken(user) {
-  return jwt.sign(
-    { 
-      id: user.id || user._id,
-      email: user.email,
-      role: user.role,
-      name: user.name
-    }, 
-    JWT_SECRET, 
-    { expiresIn: JWT_EXPIRES_IN }
+  // Create a simplified JWT token
+  const header = {
+    alg: 'HS256',
+    typ: 'JWT'
+  };
+  
+  const payload = {
+    id: user.id || user._id,
+    email: user.email,
+    role: user.role,
+    name: user.name,
+    exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7) // 7 days
+  };
+  
+  const stringifiedHeader = btoa(JSON.stringify(header));
+  const stringifiedPayload = btoa(JSON.stringify(payload));
+  
+  // In a real app, we would sign this properly
+  // This is just for demo purposes
+  const signature = btoa(
+    JSON.stringify(payload) + JWT_SECRET
   );
+  
+  return `${stringifiedHeader}.${stringifiedPayload}.${signature}`;
 }
 
 export function verifyToken(token) {
   try {
-    return jwt.verify(token, JWT_SECRET);
+    if (!token) return null;
+    
+    const [headerBase64, payloadBase64] = token.split('.');
+    
+    if (!headerBase64 || !payloadBase64) return null;
+    
+    // Decode the payload
+    const payload = JSON.parse(atob(payloadBase64));
+    
+    // Check if token is expired
+    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+      return null;
+    }
+    
+    return payload;
   } catch (error) {
+    console.error('Error verifying token:', error);
     return null;
   }
 }
