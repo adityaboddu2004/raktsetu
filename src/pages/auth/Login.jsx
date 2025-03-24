@@ -1,11 +1,13 @@
 
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Hospital, Droplet } from 'lucide-react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { Hospital, Droplet, User } from 'lucide-react';
 import Layout from '@/components/Layout';
 import Button from '@/components/Button';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -13,7 +15,11 @@ const Login = () => {
   const [role, setRole] = useState('donor');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+
+  // Get the redirect path from location state or default to dashboard
+  const from = location.state?.from || '/';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,15 +27,17 @@ const Login = () => {
 
     try {
       // Attempt to login with the provided credentials
-      await login(email, password, role);
+      const user = await login(email, password);
       
       toast({
         title: 'Login successful',
-        description: `Welcome back! You are now logged in.`,
+        description: `Welcome back, ${user.name}! You are now logged in.`,
       });
       
-      // Redirect based on role
-      if (role === 'hospital') {
+      // Redirect based on role or return URL
+      if (from !== '/') {
+        navigate(from);
+      } else if (user.role === 'hospital') {
         navigate('/hospital/dashboard');
       } else {
         navigate('/donor/dashboard');
@@ -87,10 +95,10 @@ const Login = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-muted-foreground mb-1">
+                <Label htmlFor="email" className="text-sm font-medium text-muted-foreground mb-1">
                   Email
-                </label>
-                <input
+                </Label>
+                <Input
                   id="email"
                   type="email"
                   placeholder="Enter your email"
@@ -102,10 +110,10 @@ const Login = () => {
               </div>
               
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-muted-foreground mb-1">
+                <Label htmlFor="password" className="text-sm font-medium text-muted-foreground mb-1">
                   Password
-                </label>
-                <input
+                </Label>
+                <Input
                   id="password"
                   type="password"
                   placeholder="Enter your password"

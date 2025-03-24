@@ -18,6 +18,7 @@ import AlertSettings from "./pages/donor/AlertSettings";
 import EmergencyRequest from "./pages/hospital/EmergencyRequest";
 import EventsAndCampaigns from "./pages/EventsAndCampaigns";
 import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -37,10 +38,43 @@ const App = () => (
             <Route path="/events" element={<EventsAndCampaigns />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/hospital/dashboard" element={<HospitalDashboard />} />
-            <Route path="/hospital/emergency-request" element={<EmergencyRequest />} />
-            <Route path="/donor/dashboard" element={<DonorDashboard />} />
-            <Route path="/donor/alert-settings" element={<AlertSettings />} />
+            
+            {/* Protected Hospital Routes */}
+            <Route 
+              path="/hospital/dashboard" 
+              element={
+                <ProtectedRoute requiredRole="hospital">
+                  <HospitalDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/hospital/emergency-request" 
+              element={
+                <ProtectedRoute requiredRole="hospital">
+                  <EmergencyRequest />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Protected Donor Routes */}
+            <Route 
+              path="/donor/dashboard" 
+              element={
+                <ProtectedRoute requiredRole="donor">
+                  <DonorDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/donor/alert-settings" 
+              element={
+                <ProtectedRoute requiredRole="donor">
+                  <AlertSettings />
+                </ProtectedRoute>
+              } 
+            />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
