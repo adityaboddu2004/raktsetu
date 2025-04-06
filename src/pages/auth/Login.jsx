@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('donor');
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +27,7 @@ const Login = () => {
 
     try {
       // Attempt to login with the provided credentials
-      const user = await login(email, password);
+      const user = await login(emailOrUsername, password);
       
       toast({
         title: 'Login successful',
@@ -95,15 +95,15 @@ const Login = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="email" className="text-sm font-medium text-muted-foreground mb-1">
-                  Email
+                <Label htmlFor="emailOrUsername" className="text-sm font-medium text-muted-foreground mb-1">
+                  Email or Username
                 </Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="emailOrUsername"
+                  type="text"
+                  placeholder="Enter your email or username"
+                  value={emailOrUsername}
+                  onChange={(e) => setEmailOrUsername(e.target.value)}
                   className="input-field"
                   required
                 />
@@ -139,6 +139,16 @@ const Login = () => {
                 <a href="#" className="text-sm font-medium text-blood hover:underline">
                   Forgot password?
                 </a>
+              </div>
+              
+              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4">
+                <div className="flex">
+                  <div className="ml-3">
+                    <p className="text-sm text-yellow-700">
+                      <strong>Demo Account:</strong> Use username <strong>testuser</strong> with password <strong>password123</strong> to log in
+                    </p>
+                  </div>
+                </div>
               </div>
               
               <Button

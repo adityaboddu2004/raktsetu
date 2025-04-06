@@ -11,29 +11,38 @@ import {
  * Handles login, register, logout, and profile update
  */
 export const useAuthMethods = (user, setUser, authToken, setAuthToken, setIsLoading) => {
-  const login = async (email, password) => {
+  const login = async (emailOrUsername, password) => {
     setIsLoading(true);
     try {
       // Get the users collection from MongoDB
       const usersCollection = await getUsersCollection();
       
-      // Find the user with the given email
-      const existingUser = await usersCollection.findOne({ email });
+      // Check if input is email or username
+      const isEmail = emailOrUsername.includes('@');
+      
+      // Find the user with the given email or username
+      let existingUser;
+      if (isEmail) {
+        existingUser = await usersCollection.findOne({ email: emailOrUsername });
+      } else {
+        existingUser = await usersCollection.findOne({ username: emailOrUsername });
+      }
       
       if (!existingUser) {
-        throw new Error('Invalid email or password');
+        throw new Error('Invalid credentials');
       }
       
       // Verify password
       const isPasswordValid = await comparePasswords(password, existingUser.password);
       
       if (!isPasswordValid) {
-        throw new Error('Invalid email or password');
+        throw new Error('Invalid credentials');
       }
       
       const userObject = {
         id: existingUser._id.toString(),
         email: existingUser.email,
+        username: existingUser.username,
         name: existingUser.name,
         role: existingUser.role,
         profile: existingUser.profile || {},

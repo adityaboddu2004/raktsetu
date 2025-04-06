@@ -4,11 +4,28 @@
 
 // In-memory data store (for development/demo purposes only)
 const inMemoryDB = {
-  users: [],
+  users: [
+    {
+      _id: 'dummy123',
+      username: 'testuser',
+      password: '', // Will be set to hashed value of 'password123'
+      email: 'test@example.com',
+      name: 'Test User',
+      role: 'donor',
+      isVerified: true,
+      createdAt: new Date()
+    }
+  ],
   donors: [],
   hospitals: [],
   bloodRequests: []
 };
+
+// Hash the dummy password immediately (self-executing async function)
+(async function() {
+  inMemoryDB.users[0].password = await hashPassword('password123');
+  console.log('Dummy user created with username: testuser and password: password123');
+})();
 
 // Generate a unique ID
 function generateId() {
